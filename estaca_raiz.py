@@ -224,25 +224,35 @@ st.sidebar.markdown("---")
 st.sidebar.subheader("💾 Exportação CAD (AutoCAD)")
 nome_arquivo = st.sidebar.text_input("Nome do arquivo (sem .dxf)", f"Secoes_Estaca_{d_solo_sel}mm")
 
-if st.sidebar.button("📥 Salvar DXF na Pasta do Projeto"):
-    try:
-        caminho_salvo = exportar_dxf(
-            r_s_geo=r_s_geo,
-            r_s_est=r_s_est,
-            r_r_geo_est=r_r_geo_est,
-            raio_eixo_estribo=raio_eixo_estribo,
-            raio_centro_barra=raio_centro_barra,
-            d_barra_sel=d_barra_sel,
-            n_barras=n_barras,
-            l_solo=l_solo,
-            l_rocha=l_rocha,
-            passo_estribo=passo_estribo,
-            l_espera=l_espera,
-            nome_arquivo=nome_arquivo
-        )
-        st.sidebar.success(f"✅ Arquivo gerado com SUCESSO!\nCaminho: `{caminho_salvo}`")
-    except Exception as e:
-        st.sidebar.error(f"Erro ao gerar CAD: {e}")
+try:
+    # Gera o DXF em memória (bytes)
+    dxf_bytes = exportar_dxf(
+        r_s_geo=r_s_geo,
+        r_s_est=r_s_est,
+        r_r_geo_est=r_r_geo_est,
+        raio_eixo_estribo=raio_eixo_estribo,
+        raio_centro_barra=raio_centro_barra,
+        d_barra_sel=d_barra_sel,
+        n_barras=n_barras,
+        l_solo=l_solo,
+        l_rocha=l_rocha,
+        passo_estribo=passo_estribo,
+        l_espera=l_espera,
+        nome_arquivo=nome_arquivo,
+        return_bytes=True  # Retorna bytes em vez de salvar em disco
+    )
+    
+    # Botão de download
+    st.sidebar.download_button(
+        label="📥 Baixar DXF",
+        data=dxf_bytes,
+        file_name=f"{nome_arquivo}.dxf",
+        mime="application/dxf"
+    )
+    st.sidebar.success("✅ Arquivo pronto para download!")
+    
+except Exception as e:
+    st.sidebar.error(f"Erro ao gerar CAD: {e}")
 
 
 comp_volta = math.sqrt((math.pi * d_eixo_estribo_m)**2 + passo_m**2) # Pitágoras (hipotenusa)

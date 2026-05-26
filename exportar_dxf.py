@@ -6,6 +6,7 @@ Gera ficheiro AutoCAD com secções transversais e perfil longitudinal
 import ezdxf
 import os
 import math
+import io
 
 def exportar_dxf(
     # Parâmetros geométricos
@@ -25,7 +26,8 @@ def exportar_dxf(
     
     # Ficheiro
     nome_arquivo,
-    caminho_pasta=None
+    caminho_pasta=None,
+    return_bytes=False # Se True, retorna bytes em vez de salvar em disco
 ):
     """
     Exporta o detalhamento da estaca raiz para DXF utilizando um TEMPLATE.
@@ -258,10 +260,17 @@ def exportar_dxf(
     # ==========================================
     # 5. SALVAMENTO
     # ==========================================
-    if caminho_pasta is None:
-        caminho_pasta = os.getcwd()
-    
-    caminho_final = os.path.join(caminho_pasta, f"{nome_arquivo}.dxf")
-    doc.saveas(caminho_final)
-    
-    return caminho_final
+    if return_bytes:
+        # Modo Streamlit: retorna bytes em memória
+        buffer = io.BytesIO()
+        doc.write(buffer)
+        return buffer.getvalue()
+    else:
+        # Modo disco: salva o arquivo
+        if caminho_pasta is None:
+            caminho_pasta = os.getcwd()
+        
+        caminho_final = os.path.join(caminho_pasta, f"{nome_arquivo}.dxf")
+        doc.saveas(caminho_final)
+        
+        return caminho_final
