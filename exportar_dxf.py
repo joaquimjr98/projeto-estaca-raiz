@@ -261,10 +261,10 @@ def exportar_dxf(
     # 5. SALVAMENTO
     # ==========================================
     if return_bytes:
-        # Modo Streamlit: retorna bytes em memória
-        buffer = io.BytesIO()
+        # Modo Streamlit: usa texto em memória e depois retorna bytes
+        buffer = io.StringIO()
         doc.write(buffer)
-        return buffer.getvalue()
+        return buffer.getvalue().encode('utf-8')
     else:
         # Modo disco: salva o arquivo
         if caminho_pasta is None:
